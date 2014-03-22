@@ -7,6 +7,9 @@ Then, you can emulate the app using Ripple:
 
     $ ripple emulate
 
+**Tip:**
+* After you modify some app file, refresh the page by clicking the browser "Reload" button (DO NOT USE THE KEYBOARD SHORTCUT TO RELOAD THE PAGE).
+
 # Developing with Eclipse + ADT
 
     $ cordova build
