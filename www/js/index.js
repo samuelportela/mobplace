@@ -86,6 +86,6 @@ var app = {
 		$.post(url, {'user[email]':email, 'user[password]':password}).done(function(descriptions) {
 			app.storeDescriptionsInLocalStorage(descriptions);
 			app.populateDescriptionsList(descriptions);
-		});
+		}).fail(function() {setTimeout(function(){$('#popupError').popup('open', {transition: 'pop'});}, 500);});
     }
 };
