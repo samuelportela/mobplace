@@ -1,7 +1,30 @@
+var ListView = function(el) {
+	this.el = $(el);
+};
+
+ListView.prototype.refreshList = function(items) {
+	this.el.html('');
+	this.el.hide();
+	this.addItems(items);
+	this.el.fadeIn('slow');
+};
+
+ListView.prototype.addItems = function(items) {
+	$.each(items, $.proxy(function(i, item) {
+		this.addItem(item);
+	}, this));
+};
+
+ListView.prototype.addItem = function(item) {
+	this.el.append($('<li/>').html(item.title));
+}
+
 var app = {
     // Application Constructor
     initialize: function() {
         this.bindEvents();
+		descriptionsListView = new ListView('.main ul');
+		app.populateDescriptionsList(app.getDescriptionsFromLocalStorage());
     },
     // Bind Event Listeners
     //
@@ -9,6 +32,9 @@ var app = {
     // 'load', 'deviceready', 'offline', and 'online'.
     bindEvents: function() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
+		$('a#sync').on('click', app.sync);
+		$('a#clear').on('click', app.clear);
+		$('#loginFormSubmitBtn').on('click', app.authenticateUser);
     },
     // deviceready Event Handler
     //
@@ -25,7 +51,41 @@ var app = {
 
         listeningElement.setAttribute('style', 'display:none;');
         receivedElement.setAttribute('style', 'display:block;');
-
-        console.log('Received Event: ' + id);
+    },
+    populateDescriptionsList: function(descriptions) {
+		descriptionsListView.refreshList(descriptions);
+    },
+    getDescriptionsFromLocalStorage: function() {
+        return JSON.parse(localStorage.getItem('descriptions')) || [];
+    },
+    sync: function() {
+		app.closeMenu();
+		setTimeout(function(){$('#popupLogin').popup('open', {transition: 'pop'});}, 500);
+    },
+    storeDescriptionsInLocalStorage: function(descriptions) {
+		localStorage.setItem('descriptions', JSON.stringify(descriptions));
+    },
+    clear: function() {
+		app.closeMenu();
+		app.resetLocalStorage();
+		app.populateDescriptionsList(app.getDescriptionsFromLocalStorage());
+    },
+    resetLocalStorage: function() {
+        localStorage.setItem('descriptions', JSON.stringify({descriptions: []}));
+    },
+    closeMenu: function() {
+        $('#popupMenu').popup('close');
+    },
+    authenticateUser: function(event) {
+		var domain = $('#loginForm').find('#domain').val();
+		var email = $('#loginForm').find('#email').val();
+		var password = $('#loginForm').find('#password').val();
+		$('#loginForm').find('#password').val('')
+		$('#popupLogin').popup('close');
+		var url = 'http://' + domain  + '/remote_api/list_products.json';
+		$.post(url, {'user[email]':email, 'user[password]':password}).done(function(descriptions) {
+			app.storeDescriptionsInLocalStorage(descriptions);
+			app.populateDescriptionsList(descriptions);
+		});
     }
 };
