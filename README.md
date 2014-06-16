@@ -7,8 +7,9 @@ Then, you can emulate the app using Ripple:
 
     $ ripple emulate
 
-**Tip:**
-* After you modify some app file, refresh the page by clicking the browser "Reload" button (DO NOT USE THE KEYBOARD SHORTCUT TO RELOAD THE PAGE).
+**Tips:**
+* After you modify some app file, refresh the page by clicking the browser "Reload" button (DO NOT USE THE KEYBOARD SHORTCUT TO RELOAD THE PAGE);
+* If your app is used to make cross domain requests, go to the Ripple's panel and disable the "Cross Domain Proxy" property located at the "Settings" tab.
 
 # Developing with Eclipse + ADT
 
