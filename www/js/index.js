@@ -16,7 +16,7 @@ ListView.prototype.addItems = function(items) {
 };
 
 ListView.prototype.addItem = function(item) {
-	this.el.append($('<li/>').html(item.title));
+	this.el.append($('<li/>').html(item.descricao));
 }
 
 var app = {
@@ -24,7 +24,7 @@ var app = {
     initialize: function() {
         this.bindEvents();
 		descriptionsListView = new ListView('.main ul');
-		app.populateDescriptionsList(app.getDataFromLocalStorage());
+		app.populateDescriptionsList(app.getDescriptions());
     },
     // Bind Event Listeners
     //
@@ -60,6 +60,9 @@ var app = {
     getDataFromLocalStorage: function() {
         return JSON.parse(localStorage.getItem('mob_db')) || {};
     },
+    getDescriptions: function() {
+        return app.getDataFromLocalStorage().descriptions || [];
+    },
     sync: function() {
 		app.closeMenu();
 		setTimeout(function(){$('#popupLogin').popup('open', {transition: 'pop'});}, 500);
@@ -70,7 +73,7 @@ var app = {
     clear: function() {
 		app.closeMenu();
 		app.resetLocalStorage();
-		app.populateDescriptionsList(app.getDataFromLocalStorage());
+		app.populateDescriptionsList(app.getDescriptions());
     },
     resetLocalStorage: function() {
         localStorage.setItem('mob_db', JSON.stringify({}));
@@ -88,7 +91,7 @@ var app = {
 		var url = 'http://' + domain  + '/remote_api/list_products.json';
 		$.post(url, {'user[email]':email, 'user[password]':password}).done(function(data) {
 			app.storeDataInLocalStorage(data);
-			app.populateDescriptionsList(data);
+			app.populateDescriptionsList(app.getDescriptions());
 		}).fail(function() {setTimeout(function(){$('#popupError').popup('open', {transition: 'pop'});}, 500);});
     }
 };
