@@ -35,6 +35,8 @@ var app = {
 		$('a#sync').on('click', app.sync);
 		$('a#clear').on('click', app.clear);
 		$('#loginFormSubmitBtn').on('click', app.authenticateUser);
+		$('#loginForm').find('#domain').val(JSON.parse(localStorage.getItem('mob_cfg')) ? JSON.parse(localStorage.getItem('mob_cfg')).domain : '');
+		$('#loginForm').find('#email').val(JSON.parse(localStorage.getItem('mob_cfg')) ? JSON.parse(localStorage.getItem('mob_cfg')).email : '');
     },
     // deviceready Event Handler
     //
@@ -56,14 +58,14 @@ var app = {
 		descriptionsListView.refreshList(descriptions);
     },
     getDescriptionsFromLocalStorage: function() {
-        return JSON.parse(localStorage.getItem('descriptions')) || [];
+        return JSON.parse(localStorage.getItem('mob_db')) || {};
     },
     sync: function() {
 		app.closeMenu();
 		setTimeout(function(){$('#popupLogin').popup('open', {transition: 'pop'});}, 500);
     },
     storeDescriptionsInLocalStorage: function(descriptions) {
-		localStorage.setItem('descriptions', JSON.stringify(descriptions));
+		localStorage.setItem('mob_db', JSON.stringify(descriptions));
     },
     clear: function() {
 		app.closeMenu();
@@ -71,7 +73,7 @@ var app = {
 		app.populateDescriptionsList(app.getDescriptionsFromLocalStorage());
     },
     resetLocalStorage: function() {
-        localStorage.setItem('descriptions', JSON.stringify({descriptions: []}));
+        localStorage.setItem('mob_db', JSON.stringify({}));
     },
     closeMenu: function() {
         $('#popupMenu').popup('close');
@@ -80,7 +82,8 @@ var app = {
 		var domain = $('#loginForm').find('#domain').val();
 		var email = $('#loginForm').find('#email').val();
 		var password = $('#loginForm').find('#password').val();
-		$('#loginForm').find('#password').val('')
+		localStorage.setItem('mob_cfg', JSON.stringify({domain: domain, email: email}));
+		$('#loginForm').find('#password').val('');
 		$('#popupLogin').popup('close');
 		var url = 'http://' + domain  + '/remote_api/list_products.json';
 		$.post(url, {'user[email]':email, 'user[password]':password}).done(function(descriptions) {
