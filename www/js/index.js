@@ -24,7 +24,7 @@ var app = {
     initialize: function() {
         this.bindEvents();
 		descriptionsListView = new ListView('.main ul');
-		app.populateDescriptionsList(app.getDescriptionsFromLocalStorage());
+		app.populateDescriptionsList(app.getDataFromLocalStorage());
     },
     // Bind Event Listeners
     //
@@ -57,20 +57,20 @@ var app = {
     populateDescriptionsList: function(descriptions) {
 		descriptionsListView.refreshList(descriptions);
     },
-    getDescriptionsFromLocalStorage: function() {
+    getDataFromLocalStorage: function() {
         return JSON.parse(localStorage.getItem('mob_db')) || {};
     },
     sync: function() {
 		app.closeMenu();
 		setTimeout(function(){$('#popupLogin').popup('open', {transition: 'pop'});}, 500);
     },
-    storeDescriptionsInLocalStorage: function(descriptions) {
-		localStorage.setItem('mob_db', JSON.stringify(descriptions));
+    storeDataInLocalStorage: function(data) {
+		localStorage.setItem('mob_db', JSON.stringify(data));
     },
     clear: function() {
 		app.closeMenu();
 		app.resetLocalStorage();
-		app.populateDescriptionsList(app.getDescriptionsFromLocalStorage());
+		app.populateDescriptionsList(app.getDataFromLocalStorage());
     },
     resetLocalStorage: function() {
         localStorage.setItem('mob_db', JSON.stringify({}));
@@ -86,9 +86,9 @@ var app = {
 		$('#loginForm').find('#password').val('');
 		$('#popupLogin').popup('close');
 		var url = 'http://' + domain  + '/remote_api/list_products.json';
-		$.post(url, {'user[email]':email, 'user[password]':password}).done(function(descriptions) {
-			app.storeDescriptionsInLocalStorage(descriptions);
-			app.populateDescriptionsList(descriptions);
+		$.post(url, {'user[email]':email, 'user[password]':password}).done(function(data) {
+			app.storeDataInLocalStorage(data);
+			app.populateDescriptionsList(data);
 		}).fail(function() {setTimeout(function(){$('#popupError').popup('open', {transition: 'pop'});}, 500);});
     }
 };
