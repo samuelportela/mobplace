@@ -16,14 +16,20 @@ ListView.prototype.addItems = function(items) {
 };
 
 ListView.prototype.addItem = function(item) {
-	this.el.append($('<li/>').html(item.descricao));
+	this.el.append($('<div/>').html(item.referencia
+		+ '<br />'
+		+ item.descricao
+		+ '<br />'
+		+ 'R$ '
+		+ app.formatToCurrency(app.getPriceByReference(app.getPrices(), item.referencia))
+	));
 }
 
 var app = {
     // Application Constructor
     initialize: function() {
         this.bindEvents();
-		descriptionsListView = new ListView('.main ul');
+		descriptionsListView = new ListView('.main #descriptions');
 		app.populateDescriptionsList(app.getDescriptions());
     },
     // Bind Event Listeners
@@ -63,6 +69,29 @@ var app = {
     getDescriptions: function() {
         return app.getDataFromLocalStorage().descriptions || [];
     },
+    getPrices: function() {
+        return app.getDataFromLocalStorage().prices || [];
+    },
+    getPriceByReference: function(prices, reference) {
+		return $.grep(prices, function(item) {
+		    return item.descr == reference;
+		})[0].preco;
+    },
+	formatToCurrency: function(floatOrString) {
+		floatOrString = parseFloat(floatOrString);
+		floatOrString = floatOrString.toFixed(2);
+	    floatOrString += '';
+	    x = floatOrString.split('.');
+	    x1 = x[0];
+	    x2 = x.length > 1 ? ',' + x[1] : '';
+	    var rgx = /(\d+)(\d{3})/;
+		
+	    while (rgx.test(x1)) {
+			x1 = x1.replace(rgx, '$1' + '.' + '$2');
+	    }
+		
+	    return x1 + x2;
+	},
     sync: function() {
 		app.closeMenu();
 		setTimeout(function(){$('#popupLogin').popup('open', {transition: 'pop'});}, 500);
