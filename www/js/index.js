@@ -26,6 +26,8 @@ ListView.prototype.addItem = function(item) {
 }
 
 var app = {
+    DATADIR: null,
+    knownfiles: [],
     // Application Constructor
     initialize: function() {
         this.bindEvents();
@@ -50,6 +52,10 @@ var app = {
     // function, we must explicity call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
+        
+        // Note: The file system has been prefixed as of Google Chrome 12:
+        window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+        window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, app.onFSSuccess, null);
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
@@ -60,8 +66,52 @@ var app = {
         listeningElement.setAttribute('style', 'display:none;');
         receivedElement.setAttribute('style', 'display:block;');
     },
+    //Loaded my file system, now let's get a directory entry for where I'll store my crap
+    onFSSuccess: function(fileSystem) {
+        fileSystem.root.getDirectory('br.com.mobplace', {create:true}, app.gotDir, app.onError);
+    },
+    //The directory entry callback
+    gotDir: function(d) {
+        console.log("got dir");
+        app.DATADIR = d;
+        var reader = app.DATADIR.createReader();
+        reader.readEntries(function(d) {
+            app.gotFiles(d);
+            app.appReady();
+        }, app.onError);
+    },
+    //Result of reading my directory
+    gotFiles: function(entries) {
+        console.log("The dir has " + entries.length + " entries.");
+        for (var i=0; i<entries.length; i++) {
+            console.log(entries[i].name+' dir? '+entries[i].isDirectory);
+            app.knownfiles.push(entries[i].name);
+            console.log('entries[i].fullPath: ' + entries[i].fullPath);
+            console.log('app.knownfiles: ' + app.knownfiles);
+        }
+    },
+    appReady: function() {
+        console.log('Início da função appReady');
+        var ft = new FileTransfer();
+        //var dlPath = app.DATADIR.fullPath;
+        //console.log('Local onde arquivo será salvo: ' + dlPath);
+        console.log('app.DATADIR.toURL(): ' + app.DATADIR.toURL());
+        ft.download(encodeURI('http://10.0.2.2:4000/system/product_details/photos/000/000/001/original/13212001.jpg'), app.DATADIR.toURL() + '/' + '13212001.jpg', function(e) {
+            console.log('Localização do arquivo: ' + e.toURL());
+            app.renderPicture(e.toURL());
+        }, app.onError);
+        console.log('Fim da função appReady');
+    },
+    renderPicture: function(path) {
+        $('#descriptions').append('<img src="' + path + '">');
+        console.log('<img src="' + path + '">');
+    },
+    onError: function(e) {
+        console.log('ERROR');
+        console.log(JSON.stringify(e));
+    },
     populateDescriptionsList: function(descriptions) {
-		descriptionsListView.refreshList(descriptions);
+        descriptionsListView.refreshList(descriptions);
     },
     getDataFromLocalStorage: function() {
         return JSON.parse(localStorage.getItem('mob_db')) || {};
