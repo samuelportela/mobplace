@@ -127,6 +127,14 @@ var app = {
 		    return item.descr == reference;
 		})[0].preco;
     },
+    getProductDetails: function() {
+        return app.getDataFromLocalStorage().product_details || [];
+    },
+    getProductDetailByReference: function(productDetails, reference) {
+		return $.grep(productDetails, function(item) {
+		    return item.referencia == reference;
+		})[0].url;
+    },
 	formatToCurrency: function(floatOrString) {
 		floatOrString = parseFloat(floatOrString);
 		floatOrString = floatOrString.toFixed(2);
