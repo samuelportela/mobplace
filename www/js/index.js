@@ -26,10 +26,12 @@ ListView.prototype.addItem = function(item) {
 }
 
 var app = {
+	localDatabase: {},
     DATADIR: null,
-    knownfiles: [],
+    knownFiles: [],
     // Application Constructor
     initialize: function() {
+		app.loadLocalDatabase();
         this.bindEvents();
 		descriptionsListView = new ListView('.main #descriptions');
 		app.populateDescriptionsList(app.getDescriptions());
@@ -72,55 +74,47 @@ var app = {
     },
     //The directory entry callback
     gotDir: function(d) {
-        console.log("got dir");
         app.DATADIR = d;
         var reader = app.DATADIR.createReader();
         reader.readEntries(function(d) {
             app.gotFiles(d);
-            app.appReady();
         }, app.onError);
     },
     //Result of reading my directory
     gotFiles: function(entries) {
-        console.log("The dir has " + entries.length + " entries.");
-        for (var i=0; i<entries.length; i++) {
-            console.log(entries[i].name+' dir? '+entries[i].isDirectory);
-            app.knownfiles.push(entries[i].name);
-            console.log('entries[i].fullPath: ' + entries[i].fullPath);
-            console.log('app.knownfiles: ' + app.knownfiles);
+        for (var i = 0; i < entries.length; i++) {
+            app.knownFiles.push(entries[i].name);
+			app.renderPicture(entries[i].toURL());
         }
     },
-    appReady: function() {
-        console.log('Início da função appReady');
-        var ft = new FileTransfer();
-        //var dlPath = app.DATADIR.fullPath;
-        //console.log('Local onde arquivo será salvo: ' + dlPath);
-        console.log('app.DATADIR.toURL(): ' + app.DATADIR.toURL());
-        ft.download(encodeURI('http://10.0.2.2:4000/system/product_details/photos/000/000/001/original/13212001.jpg'), app.DATADIR.toURL() + '/' + '13212001.jpg', function(e) {
-            console.log('Localização do arquivo: ' + e.toURL());
-            app.renderPicture(e.toURL());
-        }, app.onError);
-        console.log('Fim da função appReady');
-    },
     renderPicture: function(path) {
-        $('#descriptions').append('<img src="' + path + '">');
-        console.log('<img src="' + path + '">');
+        $('#photos').append('<img src="' + path + '" />');
     },
     onError: function(e) {
-        console.log('ERROR');
-        console.log(JSON.stringify(e));
+        console.log('Ocorreu um erro: ' + JSON.stringify(e));
     },
     populateDescriptionsList: function(descriptions) {
         descriptionsListView.refreshList(descriptions);
+    },
+    storeDataInLocalStorage: function(data) {
+		localStorage.setItem('mob_db', JSON.stringify(data));
+		app.loadLocalDatabase();
+    },
+    resetLocalStorage: function() {
+        localStorage.setItem('mob_db', JSON.stringify({}));
+		app.loadLocalDatabase();
+    },
+    loadLocalDatabase: function() {
+		app.localDatabase = app.getDataFromLocalStorage();
     },
     getDataFromLocalStorage: function() {
         return JSON.parse(localStorage.getItem('mob_db')) || {};
     },
     getDescriptions: function() {
-        return app.getDataFromLocalStorage().descriptions || [];
+        return app.localDatabase.descriptions || [];
     },
     getPrices: function() {
-        return app.getDataFromLocalStorage().prices || [];
+        return app.localDatabase.prices || [];
     },
     getPriceByReference: function(prices, reference) {
 		return $.grep(prices, function(item) {
@@ -128,7 +122,7 @@ var app = {
 		})[0].preco;
     },
     getProductDetails: function() {
-        return app.getDataFromLocalStorage().product_details || [];
+        return app.localDatabase.product_details || [];
     },
     getProductDetailByReference: function(productDetails, reference) {
 		return $.grep(productDetails, function(item) {
@@ -150,35 +144,50 @@ var app = {
 		
 	    return x1 + x2;
 	},
-    sync: function() {
+	sync: function() {
 		app.closeMenu();
 		setTimeout(function(){$('#popupLogin').popup('open', {transition: 'pop'});}, 500);
-    },
-    storeDataInLocalStorage: function(data) {
-		localStorage.setItem('mob_db', JSON.stringify(data));
-    },
-    clear: function() {
+	},
+	clear: function() {
 		app.closeMenu();
 		app.resetLocalStorage();
 		app.populateDescriptionsList(app.getDescriptions());
-    },
-    resetLocalStorage: function() {
-        localStorage.setItem('mob_db', JSON.stringify({}));
-    },
-    closeMenu: function() {
-        $('#popupMenu').popup('close');
-    },
-    authenticateUser: function(event) {
+	},
+	closeMenu: function() {
+		$('#popupMenu').popup('close');
+	},
+	authenticateUser: function(event) {
 		var domain = $('#loginForm').find('#domain').val();
 		var email = $('#loginForm').find('#email').val();
 		var password = $('#loginForm').find('#password').val();
 		localStorage.setItem('mob_cfg', JSON.stringify({domain: domain, email: email}));
 		$('#loginForm').find('#password').val('');
 		$('#popupLogin').popup('close');
-		var url = 'http://' + domain  + '/remote_api/list_products.json';
+		var httpDomain = 'http://' + domain;
+		var url = httpDomain  + '/remote_api/list_products.json';
 		$.post(url, {'user[email]':email, 'user[password]':password}).done(function(data) {
 			app.storeDataInLocalStorage(data);
 			app.populateDescriptionsList(app.getDescriptions());
+			var images = app.getImageUrlsToDownload(app.getProductDetails(), httpDomain);
+			app.downloadImages(images);
 		}).fail(function() {setTimeout(function(){$('#popupError').popup('open', {transition: 'pop'});}, 500);});
-    }
+	},
+	getImageUrlsToDownload: function(productDetails, httpDomain) {
+		var images = [];
+		for (var i = 0; i < productDetails.length; i++) {
+			if (app.knownFiles.indexOf(productDetails[i].photo_file_name) == -1) {
+				images.push({url: encodeURI(httpDomain + productDetails[i].url), fileName: productDetails[i].photo_file_name});
+			}
+		}
+		return images;
+	},
+	downloadImages: function(images) {
+		if (images.length > 0) {
+			var image = images.pop();
+			var ft = new FileTransfer();
+			ft.download(image.url, app.DATADIR.toURL() + '/' + image.fileName, function(e) {
+				app.downloadImages(images);
+			}, app.onError);
+		}
+	}
 };
