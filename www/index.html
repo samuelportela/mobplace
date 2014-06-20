@@ -19,7 +19,7 @@
 				        <ul data-role="listview" data-inset="true" style="min-width:210px;">
 				            <li data-role="list-divider">Menu</li>
 							<li><a id="sync" href="#">Baixar novos produtos</a></li>
-							<li><a id="clear" href="#">Limpar dados</a></li>
+							<li><a id="clear" href="#">Excluir dados do aplicativo</a></li>
 							<li><a href="#about" data-transition="slide">Sobre o Mobplace</a></li>
 				        </ul>
 				</div>
@@ -51,7 +51,16 @@
                                     <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b" data-rel="back">Ok</a>
                                 </div>
                             </div>
-							<div id="photos"></div>
+                            <div data-role="popup" id="popupClearSuccess" data-dismissible="false" style="max-width:400px;">
+                                <div data-role="header" data-theme="a">
+                                    <h1>Dados excluídos</h1>
+                                </div>
+                                <div role="main" class="ui-content">
+                                    <h3 class="ui-title">Todos os dados do aplicativo foram excluídos.</h3>
+                                    <p>Para baixar os dados novamente, clique em "Baixar novos produtos".</p>
+                                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b" data-rel="back">Ok</a>
+                                </div>
+                            </div>
 							<div id="descriptions"></div>
 						</div>
 	                </p>

@@ -16,7 +16,9 @@ ListView.prototype.addItems = function(items) {
 };
 
 ListView.prototype.addItem = function(item) {
-	this.el.append($('<div/>').html(item.referencia
+	this.el.append($('<div/>').html('<img src="' + app.getProductDetailByReference(app.getProductDetails(), item.referencia)[0].localPath + '" style="max-width: 200px; max-height: 200px;" />'
+		+ '<br />'
+		+ item.referencia
 		+ '<br />'
 		+ item.descricao
 		+ '<br />'
@@ -84,11 +86,7 @@ var app = {
     gotFiles: function(entries) {
         for (var i = 0; i < entries.length; i++) {
             app.knownFiles.push(entries[i].name);
-			app.renderPicture(entries[i].toURL());
         }
-    },
-    renderPicture: function(path) {
-        $('#photos').append('<img src="' + path + '" />');
     },
     onError: function(e) {
         console.log('Ocorreu um erro: ' + JSON.stringify(e));
@@ -127,7 +125,7 @@ var app = {
     getProductDetailByReference: function(productDetails, reference) {
 		return $.grep(productDetails, function(item) {
 		    return item.referencia == reference;
-		})[0].url;
+		});
     },
 	formatToCurrency: function(floatOrString) {
 		floatOrString = parseFloat(floatOrString);
@@ -152,9 +150,16 @@ var app = {
 		app.closeMenu();
 		app.resetLocalStorage();
 		app.populateDescriptionsList(app.getDescriptions());
+		app.deleteFiles();
 	},
 	closeMenu: function() {
 		$('#popupMenu').popup('close');
+	},
+	deleteFiles: function() {
+		app.DATADIR.removeRecursively(app.clearSuccess, app.onError);
+	},
+	clearSuccess: function() {
+		setTimeout(function(){$('#popupClearSuccess').popup('open', {transition: 'pop'});}, 500);
 	},
 	authenticateUser: function(event) {
 		var domain = $('#loginForm').find('#domain').val();
@@ -167,27 +172,27 @@ var app = {
 		var url = httpDomain  + '/remote_api/list_products.json';
 		$.post(url, {'user[email]':email, 'user[password]':password}).done(function(data) {
 			app.storeDataInLocalStorage(data);
-			app.populateDescriptionsList(app.getDescriptions());
-			var images = app.getImageUrlsToDownload(app.getProductDetails(), httpDomain);
-			app.downloadImages(images);
+			
+			//Creating another array with the same references of ProductDetails
+			var productDetailsClone = app.getProductDetails().slice(0);
+			
+			app.downloadImages(productDetailsClone, httpDomain);
 		}).fail(function() {setTimeout(function(){$('#popupError').popup('open', {transition: 'pop'});}, 500);});
 	},
-	getImageUrlsToDownload: function(productDetails, httpDomain) {
-		var images = [];
-		for (var i = 0; i < productDetails.length; i++) {
-			if (app.knownFiles.indexOf(productDetails[i].photo_file_name) == -1) {
-				images.push({url: encodeURI(httpDomain + productDetails[i].url), fileName: productDetails[i].photo_file_name});
+	downloadImages: function(productDetailsClone, httpDomain) {
+		if (productDetailsClone.length > 0) {
+			var pdClone = productDetailsClone.shift();
+			if (app.knownFiles.indexOf(pdClone.photo_file_name) == -1) {
+				pdClone.url = encodeURI(httpDomain + pdClone.url);
+				var ft = new FileTransfer();
+				ft.download(pdClone.url, app.DATADIR.toURL() + '/' + pdClone.photo_file_name, function(e) {
+					pdClone['localPath'] = e.toURL();
+					app.downloadImages(productDetailsClone, httpDomain);
+				}, app.onError);
 			}
-		}
-		return images;
-	},
-	downloadImages: function(images) {
-		if (images.length > 0) {
-			var image = images.pop();
-			var ft = new FileTransfer();
-			ft.download(image.url, app.DATADIR.toURL() + '/' + image.fileName, function(e) {
-				app.downloadImages(images);
-			}, app.onError);
+		} else {
+			app.storeDataInLocalStorage(app.localDatabase);
+			app.populateDescriptionsList(app.getDescriptions());
 		}
 	}
 };
