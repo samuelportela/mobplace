@@ -89,7 +89,7 @@ var app = {
         }
     },
     onError: function(e) {
-        console.log('Ocorreu um erro: ' + JSON.stringify(e));
+        console.log('An error occurred: ' + JSON.stringify(e));
     },
     populateDescriptionsList: function(descriptions) {
         descriptionsListView.refreshList(descriptions);
@@ -100,6 +100,7 @@ var app = {
     },
     resetLocalStorage: function() {
         localStorage.setItem('mob_db', JSON.stringify({}));
+		app.knownFiles = [];
 		app.loadLocalDatabase();
     },
     loadLocalDatabase: function() {
@@ -144,7 +145,7 @@ var app = {
 	},
 	sync: function() {
 		app.closeMenu();
-		setTimeout(function(){$('#popupLogin').popup('open', {transition: 'pop'});}, 500);
+		setTimeout(function(){$('#popupLogin').popup('open', {transition: 'pop'});}, 1000);
 	},
 	clear: function() {
 		app.closeMenu();
@@ -156,10 +157,29 @@ var app = {
 		$('#popupMenu').popup('close');
 	},
 	deleteFiles: function() {
-		app.DATADIR.removeRecursively(app.clearSuccess, app.onError);
+        var reader = app.DATADIR.createReader();
+        reader.readEntries(function(files) {
+            app.removeFiles(files);
+        }, app.onError);
+	},
+	removeFiles: function(entries) {
+        for (var i = 0; i < entries.length; i++) {
+			//Check if is the last file to be removed
+			if (i == entries.length - 1) {
+				app.DATADIR.getFile(entries[i].name, {create: false, exclusive: false}, app.removeLastFile, app.onError);
+			} else {
+				app.DATADIR.getFile(entries[i].name, {create: false, exclusive: false}, app.removeFile, app.onError);
+			}
+        }
+	},
+	removeLastFile: function(fileEntry) {
+		fileEntry.remove(app.clearSuccess, app.onError);
+	},
+	removeFile: function(fileEntry) {
+		fileEntry.remove();
 	},
 	clearSuccess: function() {
-		setTimeout(function(){$('#popupClearSuccess').popup('open', {transition: 'pop'});}, 500);
+		setTimeout(function(){$('#popupClearSuccess').popup('open', {transition: 'pop'});}, 1000);
 	},
 	authenticateUser: function(event) {
 		var domain = $('#loginForm').find('#domain').val();
@@ -177,22 +197,28 @@ var app = {
 			var productDetailsClone = app.getProductDetails().slice(0);
 			
 			app.downloadImages(productDetailsClone, httpDomain);
-		}).fail(function() {setTimeout(function(){$('#popupError').popup('open', {transition: 'pop'});}, 500);});
+		}).fail(app.showPopupError);
 	},
 	downloadImages: function(productDetailsClone, httpDomain) {
 		if (productDetailsClone.length > 0) {
 			var pdClone = productDetailsClone.shift();
+			pdClone.url = encodeURI(httpDomain + pdClone.url);
+			pdClone['localPath'] = app.DATADIR.toURL() + '/' + pdClone.photo_file_name;
 			if (app.knownFiles.indexOf(pdClone.photo_file_name) == -1) {
-				pdClone.url = encodeURI(httpDomain + pdClone.url);
+				app.knownFiles.push(pdClone.photo_file_name);
 				var ft = new FileTransfer();
 				ft.download(pdClone.url, app.DATADIR.toURL() + '/' + pdClone.photo_file_name, function(e) {
-					pdClone['localPath'] = e.toURL();
 					app.downloadImages(productDetailsClone, httpDomain);
 				}, app.onError);
+			} else {
+				app.downloadImages(productDetailsClone, httpDomain);
 			}
 		} else {
 			app.storeDataInLocalStorage(app.localDatabase);
 			app.populateDescriptionsList(app.getDescriptions());
 		}
+	},
+	showPopupError: function() {
+		setTimeout(function(){$('#popupError').popup('open', {transition: 'pop'});}, 1000);
 	}
 };
