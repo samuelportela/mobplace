@@ -21,6 +21,7 @@
 							<li><a id="sync" href="#">Baixar novos produtos</a></li>
 							<li><a id="clear" href="#">Excluir dados do aplicativo</a></li>
 							<li><a href="#about" data-transition="slide">Sobre o Mobplace</a></li>
+							<li><a id="exit" href="#">Sair</a></li>
 				        </ul>
 				</div>
 			</div>
@@ -31,9 +32,11 @@
 	                <p class="event received">
 						<div class="main">
 							<div data-role="popup" id="popupLogin" data-theme="a" class="ui-corner-all">
+                                <div data-role="header" data-theme="a">
+                                    <h1>Autenticação</h1>
+                                </div>
 							    <form id="loginForm">
 							        <div style="padding:10px 20px;">
-							            <h3>Autenticação</h3>
 										<input type="text" name="domain" id="domain" value="" placeholder="Domínio (dominio.com.br)" data-theme="a">
 							            <input type="text" name="email" id="email" value="" placeholder="E-mail" data-theme="a">
 							            <input type="password" name="password" id="password" value="" placeholder="Senha" data-theme="a">

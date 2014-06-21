@@ -57,6 +57,7 @@ var app = {
         document.addEventListener('deviceready', this.onDeviceReady, false);
 		$('a#sync').on('click', app.sync);
 		$('a#clear').on('click', app.clear);
+		$('a#exit').on('click', app.exit);
 		$('#loginFormSubmitBtn').on('click', app.authenticateUser);
 		$('#loginForm').find('#domain').val(JSON.parse(localStorage.getItem('mob_cfg')) ? JSON.parse(localStorage.getItem('mob_cfg')).domain : '');
 		$('#loginForm').find('#email').val(JSON.parse(localStorage.getItem('mob_cfg')) ? JSON.parse(localStorage.getItem('mob_cfg')).email : '');
@@ -191,6 +192,20 @@ var app = {
 	},
 	clearSuccess: function() {
 		setTimeout(function(){$('#popupClearSuccess').popup('open', {transition: 'pop'});}, 1000);
+	},
+	exit: function() {
+		navigator.notification.confirm(
+			'Deseja sair da aplicação?',
+			function(button) {
+				if (button == 2) {
+					navigator.app.exitApp();
+				} else {
+					app.closeMenu();
+				}
+			},
+			'Sair',
+			'Não,Sim'
+		);
 	},
 	authenticateUser: function(event) {
 		var domain = $('#loginForm').find('#domain').val();
