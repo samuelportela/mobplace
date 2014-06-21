@@ -42,6 +42,7 @@ var app = {
     DATADIR: null,
     knownFiles: [],
 	isLoading: false,
+	isRemoving: false,
     // Application Constructor
     initialize: function() {
 		app.loadLocalDatabase();
@@ -160,10 +161,32 @@ var app = {
 		setTimeout(function(){$('#popupLogin').popup('open', {transition: 'pop'});}, 1000);
 	},
 	clear: function() {
-		app.closeMenu();
-		app.resetLocalStorage();
-		app.populateDescriptionsList(app.getDescriptions());
-		app.deleteFiles();
+		navigator.notification.confirm(
+			'Deseja excluir todos os dados do aplicativo?',
+			function(button) {
+				if (button == 2) {
+					app.closeMenu();
+					if (app.isRemoving == false) {
+						$('[data-role="page"]').addClass('ui-disabled');
+						$.mobile.loading('show', {
+							text: 'Excluindo',
+							textVisible: true,
+							theme: 'b',
+							textonly: false,
+							html: ''
+						});
+						app.isRemoving = true;
+					}
+					app.resetLocalStorage();
+					app.populateDescriptionsList(app.getDescriptions());
+					app.deleteFiles();
+				} else {
+					app.closeMenu();
+				}
+			},
+			'Sair',
+			'Não,Sim'
+		);
 	},
 	closeMenu: function() {
 		$('#popupMenu').popup('close');
@@ -175,14 +198,20 @@ var app = {
         }, app.onError);
 	},
 	removeFiles: function(entries) {
-        for (var i = 0; i < entries.length; i++) {
-			//Check if is the last file to be removed
-			if (i == entries.length - 1) {
-				app.DATADIR.getFile(entries[i].name, {create: false, exclusive: false}, app.removeLastFile, app.onError);
-			} else {
-				app.DATADIR.getFile(entries[i].name, {create: false, exclusive: false}, app.removeFile, app.onError);
-			}
-        }
+		if (entries.length == 0) {
+			$.mobile.loading('hide');
+			$('[data-role="page"]').removeClass('ui-disabled');
+			app.isRemoving = false;
+		} else {
+	        for (var i = 0; i < entries.length; i++) {
+				//Check if is the last file to be removed
+				if (i == entries.length - 1) {
+					app.DATADIR.getFile(entries[i].name, {create: false, exclusive: false}, app.removeLastFile, app.onError);
+				} else {
+					app.DATADIR.getFile(entries[i].name, {create: false, exclusive: false}, app.removeFile, app.onError);
+				}
+	        }
+		}
 	},
 	removeLastFile: function(fileEntry) {
 		fileEntry.remove(app.clearSuccess, app.onError);
@@ -191,11 +220,13 @@ var app = {
 		fileEntry.remove();
 	},
 	clearSuccess: function() {
-		setTimeout(function(){$('#popupClearSuccess').popup('open', {transition: 'pop'});}, 1000);
+		$.mobile.loading('hide');
+		$('[data-role="page"]').removeClass('ui-disabled');
+		app.isRemoving = false;
 	},
 	exit: function() {
 		navigator.notification.confirm(
-			'Deseja sair da aplicação?',
+			'Deseja sair do aplicativo?',
 			function(button) {
 				if (button == 2) {
 					navigator.app.exitApp();
