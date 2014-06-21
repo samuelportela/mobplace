@@ -20,12 +20,11 @@ ListView.prototype.addItem = function(item) {
 	
 	this.el.append($('<div/>').html('<a href="#popupImage' + item.referencia + '" data-rel="popup" data-position-to="window" data-transition="fade"><img src="' + imgSrc + '" style="max-width: 300px; max-height: 300px;" /></a><div data-role="popup" id="popupImage' + item.referencia + '" class="photopopup" data-overlay-theme="a" data-corners="false" data-tolerance="30,15"><a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Fechar</a><img src="' + imgSrc + '"></div>'
 		+ '<br />'
-		+ item.referencia
-		+ '<br />'
-		+ item.descricao
-		+ '<br />'
-		+ 'R$ '
-		+ app.formatToCurrency(app.getPriceByReference(app.getPrices(), item.referencia))
+		+ '<div class="caption"><p>'
+		+ '<span class="description">' + item.descricao + '</span><br />'
+		+ '<span class="reference">Referência: '+ item.referencia + '</span><br />'
+		+ '<span class="price">R$ ' + app.formatToCurrency(app.getPriceByReference(app.getPrices(), item.referencia)) + '</span>'
+		+ '</p></div>'
 	));
 	
 	$('#popupImage' + item.referencia).popup();
