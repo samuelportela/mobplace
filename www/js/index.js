@@ -272,11 +272,14 @@ var app = {
 		if (productDetailsClone.length > 0) {
 			var pdClone = productDetailsClone.shift();
 			pdClone.url = encodeURI(httpDomain + pdClone.url);
-			pdClone['localPath'] = app.DATADIR.toURL() + '/' + pdClone.photo_file_name;
-			if (app.knownFiles.indexOf(pdClone.photo_file_name) == -1) {
-				app.knownFiles.push(pdClone.photo_file_name);
+			pdClone['localPath'] = app.DATADIR.toURL() + '/' + pdClone.id + '_' + pdClone.photo_file_name;
+			if (app.knownFiles.indexOf(pdClone.id + '_' + pdClone.photo_file_name) == -1) {
+				var totalImages = app.getProductDetails().length;
+				var totalImagesToDownload = totalImages - app.knownFiles.length;
+				app.updateLoadingText(totalImagesToDownload);
+				app.knownFiles.push(pdClone.id + '_' + pdClone.photo_file_name);
 				var ft = new FileTransfer();
-				ft.download(pdClone.url, app.DATADIR.toURL() + '/' + pdClone.photo_file_name, function(e) {
+				ft.download(pdClone.url, app.DATADIR.toURL() + '/' + pdClone.id + '_' + pdClone.photo_file_name, function(e) {
 					app.downloadImages(productDetailsClone, httpDomain);
 				}, app.onError);
 			} else {
@@ -289,6 +292,15 @@ var app = {
 			$('[data-role="page"]').removeClass('ui-disabled');
 			app.isLoading = false;
 		}
+	},
+	updateLoadingText: function(totalImagesToDownload) {
+		$.mobile.loading('show', {
+			text: 'Restando ' + totalImagesToDownload + ' produtos.',
+			textVisible: true,
+			theme: 'b',
+			textonly: false,
+			html: ''
+		});
 	},
 	showPopupError: function() {
 		setTimeout(function(){$('#popupError').popup('open', {transition: 'pop'});}, 1000);
