@@ -161,7 +161,7 @@ var app = {
 	},
 	clear: function() {
 		navigator.notification.confirm(
-			'Deseja excluir todos os dados do aplicativo?',
+			'Deseja excluir todos os produtos do dispositivo?',
 			function(button) {
 				if (button == 2) {
 					app.closeMenu();
@@ -294,7 +294,7 @@ var app = {
 	},
 	updateLoadingText: function(totalImagesToDownload) {
 		$.mobile.loading('show', {
-			text: 'Restando ' + totalImagesToDownload + ' produtos.',
+			text: 'Restando ' + totalImagesToDownload + ' fotos.',
 			textVisible: true,
 			theme: 'b',
 			textonly: false,

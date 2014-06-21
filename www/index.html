@@ -13,13 +13,13 @@
     <body>
 		<div data-role="page" id="home">
 			<div data-role="header" data-position="fixed">
-				<h1>Início</h1>
+				<h4>Mobplace</h4>
 				<a href="#popupMenu" data-rel="popup" data-transition="slidedown" class="ui-btn-right ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-bars ui-btn-icon-left ui-btn-a">Menu</a>
 				<div data-role="popup" id="popupMenu" data-theme="b">
 				        <ul data-role="listview" data-inset="true" style="min-width:210px;">
 				            <li data-role="list-divider">Menu</li>
 							<li><a id="sync" href="#">Baixar novos produtos</a></li>
-							<li><a id="clear" href="#">Excluir dados do aplicativo</a></li>
+							<li><a id="clear" href="#">Excluir produtos do dispositivo</a></li>
 							<li><a href="#about" data-transition="slide">Sobre o Mobplace</a></li>
 							<li><a id="exit" href="#">Sair</a></li>
 				        </ul>
@@ -28,12 +28,12 @@
 
 			<div role="main" class="ui-content">
 	            <div id="deviceready" class="blink">
-	                <p class="event listening">Carregando dados</p>
+	                <p class="event listening">Carregando produtos</p>
 	                <p class="event received">
 						<div class="main">
 							<div data-role="popup" id="popupLogin" data-theme="a" class="ui-corner-all">
                                 <div data-role="header" data-theme="a">
-                                    <h1>Autenticação</h1>
+                                    <h4>Autenticação</h4>
                                 </div>
 							    <form id="loginForm">
 							        <div style="padding:10px 20px;">
@@ -46,10 +46,10 @@
 							</div>
                             <div data-role="popup" id="popupError" data-dismissible="false" style="max-width:400px;">
                                 <div data-role="header" data-theme="a">
-                                    <h1>Erro</h1>
+                                    <h4>Erro</h4>
                                 </div>
                                 <div role="main" class="ui-content">
-                                    <h3 class="ui-title">Ocorreu um erro ao acessar o serviço.</h3>
+                                    <h4 class="ui-title">Ocorreu um erro ao acessar o serviço.</h4>
                                     <p>Favor entrar em contato com o administrador.</p>
                                     <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b" data-rel="back">Ok</a>
                                 </div>
@@ -64,24 +64,30 @@
 		            app.initialize();
 		        </script>
 			</div>
-
-			<div data-role="footer" data-position="fixed">
-				<h4>Mobplace</h4>
-			</div>
 		</div>
 
 		<div data-role="page" id="about">
 			<div data-role="header" data-position="fixed">
 				<a href="#home" class="ui-btn-left ui-btn-corner-all ui-btn ui-icon-home ui-shadow ui-btn-icon-left" data-transition="slide" data-direction="reverse">Voltar</a>
-				<h1>Sobre o Mobplace</h1>
+				<h4>Sobre o Mobplace</h4>
 			</div>
 
 			<div role="main" class="ui-content">
-				O Mobplace encontra-se atualmente em desenvolvimento.
-			</div>
-
-			<div data-role="footer" data-position="fixed">
-				<h4>Mobplace</h4>
+				<h4>Instruções</h4>
+				<p>
+					Segue abaixo uma breve explicação de cada opção do Menu:
+					<ul>
+						<li><strong>Baixar novos produtos:</strong> baixe do site os últimos produtos disponíveis;</li>
+						<li><strong>Excluir produtos do dispositivo:</strong> utilize esta opção caso deseje apagar todos os produtos de seu dispositivo;</li>
+						<li><strong>Sobre o Mobplace:</strong> entenda como utilizar o Mobplace;</li>
+						<li><strong>Sair:</strong> utilize esta opção para fechar o Mobplace.</li>
+					</ul>
+				</p>
+				<h4>Contato</h4>
+				<p>
+					O aplicativo Mobplace foi desenvolvido por Samuel Portela<br />
+					E-mail para contato: negociosnainternet@gmail.com
+				</p>
 			</div>
 		</div>
     </body>
