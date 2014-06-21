@@ -41,6 +41,7 @@ var app = {
 	localDatabase: {},
     DATADIR: null,
     knownFiles: [],
+	isLoading: false,
     // Application Constructor
     initialize: function() {
 		app.loadLocalDatabase();
@@ -201,6 +202,18 @@ var app = {
 		var httpDomain = 'http://' + domain;
 		var url = httpDomain  + '/remote_api/list_products.json';
 		$.post(url, {'user[email]':email, 'user[password]':password}).done(function(data) {
+			if (app.isLoading == false) {
+				$('[data-role="page"]').addClass('ui-disabled');
+				$.mobile.loading('show', {
+					text: 'Carregando',
+					textVisible: true,
+					theme: 'b',
+					textonly: false,
+					html: ''
+				});
+				app.isLoading = true;
+			}
+			
 			app.storeDataInLocalStorage(data);
 			
 			//Creating another array with the same references of ProductDetails
@@ -226,6 +239,9 @@ var app = {
 		} else {
 			app.storeDataInLocalStorage(app.localDatabase);
 			app.populateDescriptionsList(app.getDescriptions());
+			$.mobile.loading('hide');
+			$('[data-role="page"]').removeClass('ui-disabled');
+			app.isLoading = false;
 		}
 	},
 	showPopupError: function() {
