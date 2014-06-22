@@ -6,7 +6,6 @@
 /Users/samuel/Documents/projects/samuel/mobplace/platforms/android/ant-build/classes/br/com/mobplace/R$string.class \
 /Users/samuel/Documents/projects/samuel/mobplace/platforms/android/ant-build/classes/br/com/mobplace/R$xml.class \
 /Users/samuel/Documents/projects/samuel/mobplace/platforms/android/ant-build/classes/br/com/mobplace/R.class \
-/Users/samuel/Documents/projects/samuel/mobplace/platforms/android/ant-build/classes/org/apache/cordova/device/Device.class \
 /Users/samuel/Documents/projects/samuel/mobplace/platforms/android/ant-build/classes/org/apache/cordova/dialogs/Notification$1$1.class \
 /Users/samuel/Documents/projects/samuel/mobplace/platforms/android/ant-build/classes/org/apache/cordova/dialogs/Notification$1$2.class \
 /Users/samuel/Documents/projects/samuel/mobplace/platforms/android/ant-build/classes/org/apache/cordova/dialogs/Notification$1.class \

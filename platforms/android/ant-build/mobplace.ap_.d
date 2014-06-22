@@ -11,7 +11,6 @@
 /Users/samuel/Documents/projects/samuel/mobplace/platforms/android/ant-build/res/drawable-ldpi/icon.png \
 /Users/samuel/Documents/projects/samuel/mobplace/platforms/android/ant-build/res/drawable-mdpi/icon.png \
 /Users/samuel/Documents/projects/samuel/mobplace/platforms/android/ant-build/res/drawable-xhdpi/icon.png \
-/Users/samuel/Documents/projects/samuel/mobplace/platforms/android/assets/_where-is-www.txt \
 /Users/samuel/Documents/projects/samuel/mobplace/platforms/android/assets/www \
 /Users/samuel/Documents/projects/samuel/mobplace/platforms/android/assets/www/cordova.js \
 /Users/samuel/Documents/projects/samuel/mobplace/platforms/android/assets/www/cordova_plugins.js \
