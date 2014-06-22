@@ -104,7 +104,11 @@ var app = {
         console.log('An error occurred: ' + JSON.stringify(e));
     },
     populateDescriptionsList: function(descriptions) {
-        descriptionsListView.refreshList(descriptions);
+		if (descriptions.length > 0) {
+			descriptionsListView.refreshList(descriptions);
+		} else {
+			$('#descriptions').html('<strong>Seja bem vindo ao MobPlace!</strong><br />Para baixar do site os últimos produtos disponíveis, acesso a opção "Baixar novos produtos" do Menu.');
+		}
     },
     storeDataInLocalStorage: function(data) {
 		localStorage.setItem('mob_db', JSON.stringify(data));
